@@ -9,17 +9,17 @@ application::application(tree_base* p_head_object, string s_object_name) : tree_
 void application::build_tree_objects() {
 	string parent, child;
 	tree_base* p_head_object = this;
-	cin >> parent; // óçíà¸ì ïðàîòöà
+	cin >> parent; // ÑƒÐ·Ð½Ð°Ñ‘Ð¼ Ð¿Ñ€Ð°Ð¾Ñ‚Ñ†Ð°
 	this->s_object_name = parent;
-	bool is_new_name = false; // åñòü sibling ñ òàêèì èìåíåì?
+	bool is_new_name = false; // ÐµÑÑ‚ÑŒ sibling Ñ Ñ‚Ð°ÐºÐ¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼?
 	while (true) {
 		cin >> parent >> child;
-		if (parent == child) // êîíåö äåðåâà
+		if (parent == child) // ÐºÐ¾Ð½ÐµÑ† Ð´ÐµÑ€ÐµÐ²Ð°
 			break;
 
 		int n = p_head_object->subordinate_objects.size();
-		// ÒÎËÜÊÎ åñëè ðîäèòåëü - êðàéíèé ïîòîìîê òåêóùåãî ðîäèòåëÿ
-		// òî îí âî ãëàâå íîâîãî êîëåíà
+		// Ð¢ÐžÐ›Ð¬ÐšÐž ÐµÑÐ»Ð¸ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ - ÐºÑ€Ð°Ð¹Ð½Ð¸Ð¹ Ð¿Ð¾Ñ‚Ð¾Ð¼Ð¾Ðº Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»Ñ
+		// Ñ‚Ð¾ Ð¾Ð½ Ð²Ð¾ Ð³Ð»Ð°Ð²Ðµ Ð½Ð¾Ð²Ð¾Ð³Ð¾ ÐºÐ¾Ð»ÐµÐ½Ð°
 		if (parent != p_head_object->s_object_name) {
 			if (n > 0 &&
 				parent == p_head_object->subordinate_objects[n - 1]->s_object_name) {
@@ -27,8 +27,8 @@ void application::build_tree_objects() {
 				node* object = new node(p_head_object, child);
 			}
 		}
-		// ìîæåì íàçâàòü òàê (child) íîâîãî ðåá¸íêà,
-		// åñëè íåò äðóãèõ äåòåé ñ òàêèì èìåíåì
+		// Ð¼Ð¾Ð¶ÐµÐ¼ Ð½Ð°Ð·Ð²Ð°Ñ‚ÑŒ Ñ‚Ð°Ðº (child) Ð½Ð¾Ð²Ð¾Ð³Ð¾ Ñ€ÐµÐ±Ñ‘Ð½ÐºÐ°,
+		// ÐµÑÐ»Ð¸ Ð½ÐµÑ‚ Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ð´ÐµÑ‚ÐµÐ¹ Ñ Ñ‚Ð°ÐºÐ¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼
 		else {
 			is_new_name = false;
 			for (auto sibling : p_head_object->subordinate_objects) {

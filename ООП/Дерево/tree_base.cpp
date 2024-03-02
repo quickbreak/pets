@@ -2,27 +2,27 @@
 
 
 tree_base::tree_base(tree_base* p_head_object, string s_object_name) {
-	this->p_head_object = p_head_object; // указатель на предка
-	this->s_object_name = s_object_name; // имя потомка
+	this->p_head_object = p_head_object; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґРєР°
+	this->s_object_name = s_object_name; // РёРјСЏ РїРѕС‚РѕРјРєР°
 	if (p_head_object != NULL) {
-		p_head_object->subordinate_objects.push_back(this); // добавление предку нового потомка		
+		p_head_object->subordinate_objects.push_back(this); // РґРѕР±Р°РІР»РµРЅРёРµ РїСЂРµРґРєСѓ РЅРѕРІРѕРіРѕ РїРѕС‚РѕРјРєР°		
 	}
 }
 
 void tree_base::print() {
-	cout << this->s_object_name; // назовём праотца
+	cout << this->s_object_name; // РЅР°Р·РѕРІС‘Рј РїСЂР°РѕС‚С†Р°
 	tree_base* parent = this;
 	int n;
-	while (parent->subordinate_objects.size() > 0) { // перечисляем непосредственных потомков текущего предка
+	while (parent->subordinate_objects.size() > 0) { // РїРµСЂРµС‡РёСЃР»СЏРµРј РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹С… РїРѕС‚РѕРјРєРѕРІ С‚РµРєСѓС‰РµРіРѕ РїСЂРµРґРєР°
 		cout << '\n';
-		cout << parent->s_object_name; // называем предка
+		cout << parent->s_object_name; // РЅР°Р·С‹РІР°РµРј РїСЂРµРґРєР°
 		n = parent->subordinate_objects.size();
 		for (int i = 0; i < n; ++i) {
 			cout << "  " << parent->
 				subordinate_objects[i]->
-				s_object_name; // и его непосредственных потомков
+				s_object_name; // Рё РµРіРѕ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹С… РїРѕС‚РѕРјРєРѕРІ
 		}
-		// переходим к следующему колену
+		// РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РєРѕР»РµРЅСѓ
 		parent = parent->subordinate_objects[n - 1];
 
 	}
@@ -37,7 +37,7 @@ tree_base* tree_base::get_my_parent() {
 }
 
 tree_base* tree_base::get_my_fav_child(string fav_child_name) {
-	// любимый у меня может быть только непосредственнный потомок
+	// Р»СЋР±РёРјС‹Р№ Сѓ РјРµРЅСЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРЅС‹Р№ РїРѕС‚РѕРјРѕРє
 	for (auto child : this->subordinate_objects) {
 		if (child->s_object_name == fav_child_name) {
 			return child;
@@ -49,9 +49,9 @@ tree_base* tree_base::get_my_fav_child(string fav_child_name) {
 
 bool tree_base::change_my_name(string new_name) {
 	tree_base* parent = this->p_head_object;
-	// хочу сменить имя, но будет не прикольно,
-	// если у моих siblings есть такое имя:
-	// нас же родители путать будут...
+	// С…РѕС‡Сѓ СЃРјРµРЅРёС‚СЊ РёРјСЏ, РЅРѕ Р±СѓРґРµС‚ РЅРµ РїСЂРёРєРѕР»СЊРЅРѕ,
+	// РµСЃР»Рё Сѓ РјРѕРёС… siblings РµСЃС‚СЊ С‚Р°РєРѕРµ РёРјСЏ:
+	// РЅР°СЃ Р¶Рµ СЂРѕРґРёС‚РµР»Рё РїСѓС‚Р°С‚СЊ Р±СѓРґСѓС‚...
 	for (auto sibling : parent->subordinate_objects) {
 		if (sibling->s_object_name == new_name) {
 			return false;
