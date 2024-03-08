@@ -8,7 +8,8 @@ import sqlite3 as sql
 from bs4 import BeautifulSoup as bs
 import requests
 
-# ↓ Токен, который дал BotFather при регистрации
+# ↓↓↓ Ниже нужно вставить токен, который дал BotFather при регистрации
+# Пример: token = '2007628239:AAEF4ZVqLiRKG7j49EC4vaRwXjJ6DN6xng8'
 token = ""  # <<< Ваш токен
 
 bot = telebot.TeleBot(token)
@@ -86,17 +87,14 @@ def download_file(bot, file_id):
 
 @bot.message_handler(commands=["hey"])
 def say_hi(message):
-
-    if message.chat.id == 123:  # мой аккаунт
-        bot.send_message(message.chat.id, f"добрый день")
-    elif message.from_user.first_name == "Миша":
-        bot.send_message(message.chat.id, f"добрый день, master")
+    if message.from_user.username == "...":
+        bot.send_message(message.chat.id, f"доброе утро, шеф!")
     else:
         bot.send_message(
             message.chat.id, f"{message.from_user.first_name} banned. Say bye to him"
         )
     # New Year edition
-    # if message.from_user.first_name == "Миша":
+    # if message.from_user.username == "...":
     #     bot.send_message(message.chat.id, f"С новой годой, говнокодер")
     # else:
     #     bot.send_message(
@@ -140,15 +138,12 @@ def reply(message):
 @bot.message_handler(commands=["member_list"])
 def reply(message):
     # print(message.chat.id)
-    if message.chat.id == 123:  # мой аккаунт
-        bot.send_message(message.chat.id, f"здрасьте, шеф")
-
-    if message.chat.id == 123:  # чат с друзьями Bollywood
-        if message.from_user.first_name == "Миша":
+    if message.chat.id == 0:  # чат с друзьями Bollywood
+        if message.from_user.username == "...":
             bot.send_message(message.chat.id, f"отправляю, шеф")
         bot.send_message(
             message.chat.id,
-            f"",
+            f"...",
         )
     else:
         bot.send_message(message.chat.id, f"доступно только в группе")
@@ -185,6 +180,103 @@ def reply(message):
 
     # выход из команды
     # adding_a_quote_flag = False
+
+
+@bot.message_handler(commands=["call_developer"])  # написать разрабу
+def reply(message):
+    bot.send_message(message.chat.id, f'ник разработчика: ...\nмогу подсказать, с чего начать:\n'
+                                      f'"привет, Миша! Когда выйдешь на работу?.."')
+
+class databaseclass(object):
+    '''def add_contact(self, s: str):
+        connection = sql.connect('database.db')
+        cursor = connection.cursor()
+        error = 'косяк на разрабе'
+        data = [x for x in s.split('\n')]
+        try:
+            cursor.execute('INSERT OR REPLACE INTO Users (id, username, fullname, phone, birthdate, contactslist) '
+                           'VALUES(?, ?, ?, ?, ?, ?)',
+                           (int(data[0]), data[1], data[2], data[3], data[4], data[5]))
+            error = 'added successfully'
+        except sql.Error as e:
+            error = 'Не удалось добавить пользователя. Введите все перечисленные параметры, каждый с новой строки'
+
+        finally:
+            connection.commit()
+            connection.close()
+            return error
+
+    def get_info(self, id_number, my_username):
+        connection = sql.connect('database.db')
+        cursor = connection.cursor()
+        info = 'У Вас нет доступа к данным этого пользователя'
+        able = False
+        # my_username = message.from_user.username
+        # my_username = '...'
+        try:
+            cursor.execute(f'Select contactslist from Users where username = "{my_username}"')
+            list_of_contacts = cursor.fetchone()
+            if id_number in list_of_contacts:
+                able = True
+        except sql.Error as e:
+            info = 'Вас найти не смог'
+
+        # anyway
+        finally:
+            connection.commit()
+        # если нет доступа
+        if not able:
+            connection.close()
+            return info
+
+        # если доступ есть
+        try:
+            cursor.execute(f'Select * from Users where id = {id_number}')
+            info = cursor.fetchone()
+        except sql.Error as e:
+            info = 'Не удалось найти пользователя. Проверьте, правильно ли вы ввели идентификатор(id)'
+
+        # anyway
+        finally:
+            connection.commit()
+            connection.close()
+            return info
+
+        # обязательно в любом случае
+        connection.close()'''
+
+    @staticmethod
+    def print_contacts_list(message, my_username: str):
+        connection = sql.connect('database.db')
+        cursor = connection.cursor()
+        error = 1
+        try:
+            cursor.execute(f'select contactslist from Users where username = "{my_username}"')
+            list_of_contacts = cursor.fetchone()
+            list_of_contacts = str(list_of_contacts)[2:-3].split()
+            answer = ''
+            for id_number in list_of_contacts:
+                cursor.execute(f'select fullname from Users where id = {int(id_number)}')
+                name = cursor.fetchone()
+                answer += f'{id_number} {str(name)[2:-3]}' + '\n'
+            bot.send_message(message.chat.id, answer)
+            error = 0
+        except sql.Error as e:
+            error = 1
+
+        finally:
+            connection.commit()
+            connection.close()
+            return error
+
+
+@bot.message_handler(commands=["contacts_list"])  # список контактов
+def reply(message):
+    database = databaseclass()
+    exit_code = database.print_contacts_list(message, str(message.from_user.username))
+    if exit_code == 1:
+        bot.send_message(message.chat.id, f'Не удалось высвесит список ваших контактов. '
+                                          f'Пожалуйста, сообщите разработчику ... об ошибке')
 
 
 @bot.message_handler(content_types=["text"])
@@ -248,6 +340,3 @@ def transcript(message):
 # Запускаем бота. Он будет работать, пока мы не остановим выполнение программы
 bot.polling()
 
-# with open('quotes.txt', 'r', encoding="utf8") as f:
-#     a = f.read()
-#     print(a)
