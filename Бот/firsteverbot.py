@@ -114,9 +114,9 @@ def reply(message):
         list_w_quotes.append(quote)
 
     bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n\n(с) Jason Statham")
+    
 
-
-# если после выззова poetry не ввели номер, а вызвали
+# если после вызова poetry не ввели номер, а вызвали
 # следующую команду, он забывает про poetry,
 # так что отключать флаги не надо
 
