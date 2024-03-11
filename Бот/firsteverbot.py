@@ -105,28 +105,6 @@ def say_hi(message):
     #     )
 
 
-# @bot.message_handler(commands=["alexandr"])
-# def reply(message):
-#     bot.send_message(
-#         message.chat.id,
-#         f"Когда сильно я убитый — Александр (Александр)\n\
-# Мой аккаунт на Авито — Александр (Александр)\n\
-# Александр — это моё имя в Tinder\n\
-# Александр — это как бы мой скафандр",
-#     )
-
-
-# @bot.message_handler(commands=["egor"])
-# def reply(message):
-#     bot.send_message(
-#         message.chat.id,
-#         f"Кати-Маши, Юли-Гали\n\
-# На всякий случай тоже упали\n\
-# Все попадали как забор\n\
-# Остался один Егор",
-#     )
-
-
 @bot.message_handler(commands=["quote"])
 def reply(message):
     list_w_quotes = []
@@ -136,24 +114,6 @@ def reply(message):
         list_w_quotes.append(quote)
 
     bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n\n(с) Jason Statham")
-
-
-@bot.message_handler(commands=["member_list"])
-def reply(message):
-    # print(message.chat.id)
-    if message.chat.id == '...':  # чат с друзьями Bollywood
-        if message.from_user.username == "...":
-            bot.send_message(message.chat.id, f"отправляю, шеф")
-        bot.send_message(
-            message.chat.id,
-            f"Грибов Всеволод Дмитриевич 23.03.2005\n\
-Дичин Александр Ильич 28.12.2004\n\
-Кузнецов Арсений Эдуардович 28.11.2005\n\
-Смолин Егор Максимович 21.11.2005\n\
-Запрягаев Михаил Александрович 26.02.2005",
-        )
-    else:
-        bot.send_message(message.chat.id, f"доступно только в группе")
 
 
 # если после выззова poetry не ввели номер, а вызвали
@@ -252,7 +212,6 @@ class databaseclass(object):
             connection.commit()
             connection.close()
             return error
-
 
     @staticmethod
     def get_info(my_username: str, id_number: str):
@@ -364,7 +323,6 @@ def reply(message):
                                           f'Пожалуйста, сообщите разработчику ... об ошибке')
 
 
-
 @bot.message_handler(content_types=["text"])
 def reply(message):
     message_text = str(message.text)
@@ -431,8 +389,8 @@ def reply(message):
         info = database.get_info(str(message.from_user.username), message.text)
         if isinstance(info, list):
             bot.send_message(message.chat.id, f'Вот что известно про этого человека:\n\n'
-                                          f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
-                                          f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
+                                              f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
+                                              f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
         else:
             bot.send_message(message.chat.id, info)
 
@@ -454,4 +412,4 @@ def transcript(message):
 
 # Запускаем бота. Он будет работать, пока мы не остановим выполнение программы
 bot.polling()
-#bot.infinity_polling(timeout=10, long_polling_timeout = 5)
+# bot.infinity_polling(timeout=10, long_polling_timeout = 5)
