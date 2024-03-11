@@ -5,6 +5,8 @@
 
 using namespace std;
 
+extern int successfull_tests_cnt; // глобальная переменная - количество успешно пройденных тестов
+
 class tree_base{
 	
 	tree_base * p_head_object; // указатель на предка
@@ -19,7 +21,7 @@ public:
 	string get_my_name(); // вспомнить моё имя
 	tree_base * get_my_parent(); // позвать моего предка
 	void print(); // всех спалить
-	string print(int i);
+	string print(string filename_in);
 	tree_base * get_my_fav_child(string fav_child_name); // позвать моего лююбимого потомка
 	bool is_new_name(string new_name); // есть ли у меня уже потомок с именем new_name?
 	

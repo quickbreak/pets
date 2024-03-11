@@ -30,7 +30,7 @@ void tree_base::print(){
 	}
 }
 
-string tree_base::print(int i) {
+string tree_base::print(string filename_out) {
 
 	string answer = "";
 	//cout << this->s_object_name; // назовём праотца
@@ -52,7 +52,7 @@ string tree_base::print(int i) {
 
 	}
 
-	ifstream file("test7_out.txt");
+	ifstream file(filename_out);
 	string had_to_get;
 	string s = "";
 	getline(file, s, '\n');
@@ -61,8 +61,11 @@ string tree_base::print(int i) {
 		getline(file, s, '\n');
 	}
 	file.close();
-	cout << had_to_get;
-	return (answer+"\n" == had_to_get) ? "Test Passed!" : "Test Failed.";
+	string happily = "Test_" + to_string(filename_out[4] - 48) + "_Passed!\n";
+	string sadly = "Test_" + to_string(filename_out[4] - 48) + "_Failed.\n";
+	if (answer + "\n" == had_to_get)
+		++successfull_tests_cnt;
+	return (answer + "\n" == had_to_get) ? happily : sadly;
 }
 
 string tree_base::get_my_name(){

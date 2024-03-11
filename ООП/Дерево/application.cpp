@@ -6,10 +6,10 @@
 
 application::application(tree_base * p_head_object, string s_object_name): tree_base(p_head_object,s_object_name){};
 
-void application::build_tree_objects (){
+void application::build_tree_objects (string filename_in){
 	string parent, child;
 	tree_base* p_head_object = this;
-	ifstream file("test7_in.txt");
+	ifstream file(filename_in);
 	file >> parent; // узнаём праотца
 	this -> change_name(parent);
 	node* last_son = NULL;
@@ -37,9 +37,7 @@ void application::build_tree_objects (){
 	}
 	file.close();
 }
-int application::exec_app(){
-	// this -> print();
-	string got = this->print(0);
+void application::exec_app(string filename_out){
+	string got = this->print(filename_out);
 	cout << got;
-	return 0;
 }

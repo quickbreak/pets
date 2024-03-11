@@ -7,8 +7,8 @@ class application : public tree_base {
 
 public:
 	application(tree_base* p_head_object, string s_object_name = "Base_object");
-	void build_tree_objects();
-	int exec_app();
+	void build_tree_objects(string filename_in);
+	void exec_app(string filename_out);
 };
 
 #endif
