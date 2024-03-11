@@ -136,27 +136,9 @@ def reply(message):
         list_w_quotes.append(quote)
 
     bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n\n(с) Jason Statham")
+    
 
-
-@bot.message_handler(commands=["member_list"])
-def reply(message):
-    # print(message.chat.id)
-    if message.chat.id == '...':  # чат с друзьями Bollywood
-        if message.from_user.username == "...":
-            bot.send_message(message.chat.id, f"отправляю, шеф")
-        bot.send_message(
-            message.chat.id,
-            f"Грибов Всеволод Дмитриевич 23.03.2005\n\
-Дичин Александр Ильич 28.12.2004\n\
-Кузнецов Арсений Эдуардович 28.11.2005\n\
-Смолин Егор Максимович 21.11.2005\n\
-Запрягаев Михаил Александрович 26.02.2005",
-        )
-    else:
-        bot.send_message(message.chat.id, f"доступно только в группе")
-
-
-# если после выззова poetry не ввели номер, а вызвали
+# если после вызова poetry не ввели номер, а вызвали
 # следующую команду, он забывает про poetry,
 # так что отключать флаги не надо
 
