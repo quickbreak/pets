@@ -6,40 +6,50 @@ using namespace std;
 
 class class_w_a {
 
-	int* a;
+	int* a = NULL;
 
 public:
 
 	class_w_a(int number) {
-		a = new int[number];
+		this->a = new int[number];
 		for (int i = 0; i < number; ++i) {
-			a[i] = number;
+			this->a[i] = number;
 		}
 
 	};
 
 	~class_w_a() {
-		delete a;
+		delete this->a;
 	}
 
 	void print() {
-		{
-			for (int i = 0; i < a[0] - 1; ++i) {
-				std::cout << a[i] << "  ";
-			}
-			std::cout << a[a[0] - 1];
+		for (int i = 0; i < this->a[0] - 1; ++i) {
+			std::cout << this->a[i] << "  ";
+		}
+		std::cout << this->a[this->a[0] - 1];
+	};
+
+	void set_a(int number) {
+		delete this->a;
+		this->a = new int[number];
+		for (int i = 0; i < number; ++i) {
+			this->a[i] = number;
 		}
 	};
 
-	void set_a(int* b) {
-		a = b;
+	int get_a() {
+		return this->a[0];
 
 	};
 
-	int* get_a() {
-		return a;
-
-	};
+	class_w_a& operator = (const class_w_a& b) {
+		delete this->a;
+		int number = b.a[0];
+		this->a = new int[number];
+		for (int i = 0; i < number; ++i)
+			this->a[i] = number;
+		return *this;
+	}
 };
 
 
@@ -58,9 +68,9 @@ int main()
 		return 0;
 	}
 	class_w_a obj_2(number);
-	int* p_a = obj_1.get_a(); // спасение поля а первого объекта
+	number = obj_1.get_a(); // С‡С‚РѕР±С‹ Р·Р°РїРѕРјРЅРёС‚СЊ РјР°СЃСЃРёРІ РїРµСЂРІРѕРіРѕ РѕР±СЉРµРєС‚Р°                                                                   
 	obj_1 = obj_2;
-	obj_1.set_a(p_a);
+	obj_1.set_a(number);
 	obj_1.print();
 	cout << '\n';
 	obj_2.print();
