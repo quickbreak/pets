@@ -6,19 +6,7 @@ using namespace std;
 
 class class_w_a {
 
-	//class class_w_a {
-	//	int* a;
-	//public:
-	//	class_w_a(int number);
-	//	//std::vector<int>*a = new std::vector<int>;
-	//	void set_a(int* b);
-	//	int* get_a();
-	//	void print();
-	//	~class_w_a();
-	//};
-
 	int* a;
-
 
 public:
 
