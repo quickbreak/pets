@@ -23,7 +23,7 @@ public:
 	linkedlist() : head(NULL), tail(NULL) {};
 
 	// список пуст?
-	const bool empty() {
+	bool empty() const {
 		return head == NULL;
 	};
 
@@ -56,7 +56,7 @@ public:
 	};
 
 	// вывести элементов списка
-	const void print() {
+	void print() const {
 		if (this->empty())
 			return;
 		node* current = head;
@@ -68,7 +68,7 @@ public:
 	};
 
 	// поиск элемента по значению, первого по порядку
-	const node* find(int value) {
+	node* find(int value) const {
 		if (this->empty())
 			return NULL;
 		node* current = head;
@@ -181,7 +181,7 @@ linkedlist* create_a(linkedlist& b) {
 }
 
 // создать список на основе массива списков
-linkedlist create_list(linkedlist* &a) {
+linkedlist create_list(linkedlist*& a) {
 	linkedlist b;
 	for (int i = 0; i < 10; ++i) {
 		node* current = a[i].head;
@@ -190,7 +190,7 @@ linkedlist create_list(linkedlist* &a) {
 			current = current->next;
 		}
 	}
-	
+
 	return b;
 }
 
@@ -256,7 +256,7 @@ int main() {
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
 	//cout << a.head->next->value << '\n';
 	a.print();
-	const node* p = a.find(2);
+	node* p = a.find(2);
 	if (p != NULL)
 		cout << p->value << '\n';
 	a.erase(2);
