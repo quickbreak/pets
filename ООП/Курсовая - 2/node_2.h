@@ -4,9 +4,12 @@
 #include "tree_base.h"
 
 
-class node_2 : public tree_base {
+class node_2 final : public tree_base {
 public:
-	node_2(tree_base* p_head_object, string s_object_name = "Base_object");
+	// node_2(tree_base* p_head_object, string s_object_name = "Base_object");
+
+	using tree_base::tree_base;
+
 
 };
 

@@ -4,39 +4,39 @@
 #include <queue>
 
 
-tree_base::tree_base(tree_base * p_head_object, string s_object_name){
-	this -> p_head_object = p_head_object; // указатель на предка
-	this -> s_object_name = s_object_name; // имя потомка
-	if (p_head_object != NULL){
-		p_head_object -> subordinate_objects.push_back(this); // добавление предку нового потомка		
+tree_base::tree_base(tree_base* p_head_object, const string s_object_name) {
+	this->p_head_object = p_head_object; // указатель на предка
+	this->s_object_name = s_object_name; // имя потомка
+	if (this->p_head_object != NULL) {
+		this->p_head_object->subordinate_objects.push_back(this); // добавление предку нового потомка		
 	}
 }
 
-void tree_base::print(){
-	cout << this -> s_object_name; // назовём праотца
-	tree_base* parent = this;
+void tree_base::print() const {
+	cout << this->s_object_name; // назовём праотца
+	const tree_base* parent = this;
 	int n;
-	while(parent->subordinate_objects.size()>0){ // перечисляем непосредственных потомков текущего предка
+	while (parent->subordinate_objects.size() > 0) { // перечисляем непосредственных потомков текущего предка
 		cout << '\n';
-		cout << parent -> s_object_name; // называем предка
+		cout << parent->s_object_name; // называем предка
 		n = parent->subordinate_objects.size();
-		for(int i = 0; i < n; ++i){
+		for (int i = 0; i < n; ++i) {
 			cout << "  " << parent->
 				subordinate_objects[i]->
 				s_object_name; // и его непосредственных потомков
 		}
 		// переходим к следующему колену
-		parent = parent->subordinate_objects[n-1];
-		
+		parent = parent->subordinate_objects[n - 1];
+
 	}
 }
 
-//string tree_base::print(string filename_out) {
+//string tree_base::print(string filename_out) const{
 //
 //	string answer = "";
 //	//cout << this->s_object_name; // назовём праотца
 //	answer += this->s_object_name;
-//	tree_base* parent = this;
+//	const tree_base* parent = this;
 //	int n;
 //	while (parent->subordinate_objects.size() > 0) { // перечисляем непосредственных потомков текущего предка
 //		//cout << '\n';
@@ -69,26 +69,26 @@ void tree_base::print(){
 //	return (answer + "\n" == had_to_get) ? happily : sadly;
 //}
 
-string tree_base::get_my_name(){
+string tree_base::get_my_name() const {
 	return this->s_object_name;
 }
 
-tree_base * tree_base::get_my_parent(){
+tree_base* tree_base::get_my_parent() const {
 	return this->p_head_object;
 }
 
-tree_base * tree_base::get_my_fav_child(string fav_child_name){
+tree_base* tree_base::get_my_fav_child(const string fav_child_name) const {
 	// любимый у меня может быть только непосредственнный потомок
-	for(auto child : this->subordinate_objects){
-		if(child->s_object_name == fav_child_name){
+	for (auto child : this->subordinate_objects) {
+		if (child->s_object_name == fav_child_name) {
 			return child;
 		}
 	}
 	return NULL;
 }
 
-bool tree_base::is_new_name(string new_name){
-	tree_base* me = this;
+bool tree_base::is_new_name(const string new_name) const {
+	const tree_base* me = this;
 	// есть ли у меня уже потомок с именем new_name?
 	for (auto sibling : me->subordinate_objects) {
 		if (sibling->s_object_name == new_name) {
@@ -96,22 +96,22 @@ bool tree_base::is_new_name(string new_name){
 		}
 	}
 	return true;
-	
+
 }
 
-bool tree_base::change_name(string new_name){
+bool tree_base::change_name(const string new_name) {
 	tree_base* parent = this->p_head_object;
 	// хочу сменить имя, но будет не прикольно,
 	// если у моих siblings есть такое имя:
 	// нас же родители путать будут...
-	if (parent == NULL || parent->is_new_name(new_name)){
+	if (parent == NULL || parent->is_new_name(new_name)) {
 		this->s_object_name = new_name;
 		return true;
 	}
 	else return false;
 }
 
-void tree_base::dfs(string otstup) {
+void tree_base::dfs(const string otstup) const {
 	// вывод имени корня
 	cout << '\n' << otstup << this->get_my_name();
 	// dfs: вывод имени каждой вершины
@@ -120,7 +120,7 @@ void tree_base::dfs(string otstup) {
 	}
 }
 
-void tree_base::set_readiness(int num) {
+void tree_base::set_readiness(const int num) {
 	// если это отключение готовности,
 	if (num == 0) {
 		// то отключается этот объект
@@ -140,7 +140,7 @@ void tree_base::set_readiness(int num) {
 			if (p_head->readiness == 0) {
 				// во включении исходного отказано
 				readiness_flag = false;
-				break; 
+				break;
 
 			}
 		}
@@ -151,7 +151,7 @@ void tree_base::set_readiness(int num) {
 	}
 }
 
-void tree_base::dfs_with_readiness(string otstup) {
+void tree_base::dfs_with_readiness(const string otstup) const {
 	// вывод готовности корня
 	cout << '\n' << otstup << this->get_my_name();
 	if (this->readiness != 0)
@@ -164,7 +164,7 @@ void tree_base::dfs_with_readiness(string otstup) {
 	}
 }
 
-tree_base* tree_base::find_by_name_down(string name) {
+tree_base* tree_base::find_by_name_down(const string name) {
 
 	// check myself
 	if (this->s_object_name == name)
@@ -182,7 +182,7 @@ tree_base* tree_base::find_by_name_down(string name) {
 	return NULL;
 }
 
-tree_base* tree_base::find_by_name(string name) {
+tree_base* tree_base::find_by_name(const string name) {
 
 	// если метод вызван у корня, и это единственнная вершина дерева
 	if (this->p_head_object == NULL && this->subordinate_objects.size() == 0) {
@@ -199,7 +199,7 @@ tree_base* tree_base::find_by_name(string name) {
 
 	}
 	tree_base* root = p_head;
-	
+
 	// ищем на всём дереве
 	return root->find_by_name_down(name);
 

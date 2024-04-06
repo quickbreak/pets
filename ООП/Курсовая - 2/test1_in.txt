@@ -1,0 +1,12 @@
+app_root
+app_root object_01 3
+app_root object_02 2
+object_02 object_04 3
+object_02 object_05 5
+object_01 object_07 2
+endtree
+app_root 1
+object_07 3
+object_01 1
+object_02 -2
+object_04 1

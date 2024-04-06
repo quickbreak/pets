@@ -1,0 +1,14 @@
+Object tree
+app_root
+    object_01
+        object_07
+    object_02
+        object_04
+        object_05
+The tree of objects and their readiness
+app_root is ready
+    object_01 is ready
+        object_07 is not ready
+    object_02 is ready
+        object_04 is ready
+        object_05 is not ready

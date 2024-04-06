@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <clocale>
 
 using namespace std;
 
@@ -55,7 +56,7 @@ public:
 		head = x;
 	};
 
-	// вывести элементов списка
+	// вывести элементы списка
 	void print() const {
 		if (this->empty())
 			return;
@@ -196,7 +197,7 @@ linkedlist create_list(linkedlist*& a) {
 
 
 int main() {
-	setlocale(0, "RU");
+	setlocale(LC_ALL, "Russian");
 	//int a = 10, b = 20, c = 30;
 	//int* x = &a;
 	//int* y = &b;
@@ -208,40 +209,23 @@ int main() {
 
 
 	// ТЕСТ PUSH_BACK
-	//node x = { 1 };
-	////cout << x.value << ' ' << x.next << '\n';
-	//linkedlist a;
-	////cout << a.tail->value << ' ' << a.tail->next << '\n';
-	//a.push_back(&x);
-	////cout << a.tail->value << ' ' << a.tail->next << '\n';
-	//node y = { 2 };
-	//a.push_back(&y);
-	////cout << a.tail->value << ' ' << a.tail->next << '\n';
-	//node z = { 3 };
-	//a.push_back(&z);
-	////cout << a.tail->value << ' ' << a.tail->next << '\n';
-	////cout << a.head->next->value << '\n';
-	//a.print();
-
-
-	// ТЕСТ PUSH_FRONT
-	/*node x = {1};
+	/*//node x = { 1 };
 	//cout << x.value << ' ' << x.next << '\n';
 	linkedlist a;
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
-	a.push_front(&x);
+	a.push_back(1);
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
-	node y = { 2 };
-	a.push_front(&y);
+	//node y = { 2 };
+	a.push_back(2);
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
-	node z = { 3 };
-	a.push_front(&z);
+	//node z = { 3 };
+	a.push_back(3);
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
 	//cout << a.head->next->value << '\n';
 	a.print();*/
 
 
-	// ТЕСТ ERASE и FIND
+	// ТЕСТ PUSH_FRONT
 	/*//node x = {1};
 	//cout << x.value << ' ' << x.next << '\n';
 	linkedlist a;
@@ -255,6 +239,14 @@ int main() {
 	a.push_front(3);
 	//cout << a.tail->value << ' ' << a.tail->next << '\n';
 	//cout << a.head->next->value << '\n';
+	a.print();*/
+
+
+	// ТЕСТ ERASE и FIND
+	/*linkedlist a;
+	a.push_front(1);
+	a.push_front(2);
+	a.push_front(3);
 	a.print();
 	node* p = a.find(2);
 	if (p != NULL)
@@ -286,36 +278,39 @@ int main() {
 		cout << p->value << '\n';*/
 
 
-	// ТЕСТ fill и fill_auto
-	/*linkedlist a, b;
-	a.fill();
-	cout << "Список а:\n";
-	a.print();
-	cout << "Список b:\n";
-	b.fill_auto();*/
+		// ТЕСТ fill и fill_auto
+		/*cout << "Миха\n";
+		linkedlist a, b;
+		a.fill();
+		cout << "Список а:\n";
+		a.print();
+		cout << "Список b:\n";
+		b.fill_auto();*/
 
-	// ТЕСТ clear
-	/*linkedlist a;
-	a.fill_auto();
-	a.clear();
-	cout << "OK\n";*/
+		// ТЕСТ clear
+		/*linkedlist a;
+		a.fill_auto();
+		clear(a);
+		cout << "OK\n";*/
 
 
-	// ТЕСТ ИНДИВИДУАЛЬНОГО ЗАДАНИЯ
+		// ТЕСТ ИНДИВИДУАЛЬНОГО ЗАДАНИЯ
+	/*
+	7
+	15
+	20
+	30
+	49
+	86
+	97
+	4
+	*/
 	/*linkedlist b;
 	b.fill_auto();
 	clear(b);
-	b.fill();*/
-/*
-15
-20
-30
-49
-86
-97
-4
-*/
-	/*linkedlist* created_list = create_a(b);
+	b.fill();
+
+	linkedlist* created_list = create_a(b);
 	cout << "Массив, собранный по списку:\n";
 	for (int i = 0; i < 10; ++i) {
 		if (created_list[i].empty())
