@@ -1,0 +1,31 @@
+Object tree
+rootela
+    object_1
+        object_7
+    object_2
+        object_4
+            object_7
+        object_5
+        object_3
+    object_3
+object_2/object_4     Object name: object_4
+Object is set: object_2
+//object_7     Object is not found
+object_4/object_7     Object name: object_7
+.     Object name: object_2
+.object_7     Object name: object_7
+object_4/object_7     Object name: object_7
+.object_7     Redefining the head object failed
+Object is set: object_7
+//object_1     Dubbing the names of subordinate objects
+New head object: object_3
+Current object hierarchy tree
+rootela
+    object_1
+        object_7
+    object_2
+        object_4
+        object_5
+        object_3
+    object_3
+        object_7

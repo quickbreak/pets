@@ -18,5 +18,5 @@ void Base::set_both(const int private_number, const int public_number) {
 }
 
 void Base::show() const {
-	std::cout << this->private_number << ' ' << this->public_number;
+	std::cout << this->private_number << "    " << this->public_number;
 }

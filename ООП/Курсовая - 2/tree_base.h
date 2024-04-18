@@ -5,7 +5,7 @@
 
 using namespace std;
 
-//extern int successfull_tests_cnt; // глобальная переменная - количество успешно пройденных тестов
+//extern int successful_tests_cnt; // глобальная переменная - количество успешно пройденных тестов
 
 class tree_base {
 
@@ -23,22 +23,20 @@ public:
 	//изменение имени объекта
 	bool change_name(const string new_name);
 	// вспомнить моё имя
-	string get_my_name() const;
+	const string get_my_name() const;
 	// позвать моего предка
-	tree_base* get_my_parent() const;
-	// всех спалить
-	void print() const;
+	const tree_base* get_my_parent() const;
 	//string print(string filename_in) const;
-	// позвать моего лююбимого потомка
-	tree_base* get_my_fav_child(const string fav_child_name) const;
+	// позвать моего любимого потомка
+	tree_base* get_my_fav_child(const string fav_child_name);
 	// есть ли у меня уже потомок с именем new_name?
-	bool is_new_name(const string new_name) const;
+	bool is_new_name(const string new_name);
 	// вывод дерева в глубину
-	void dfs(const string otstup) const;
+	void dfs() const;
 	// установить готовность
 	void set_readiness(const int);
 	// вывод дерева с готовностями в глубину
-	void dfs_with_readiness(const string otstup) const;
+	void dfs_with_readiness() const;
 	// возвращает указатель на чувака с текущей ветки с именем name
 	tree_base* find_by_name_down(const string name);
 	// возвращает указатель на чувака с именем name

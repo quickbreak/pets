@@ -1,0 +1,4 @@
+Object_1 2
+Object_2 4
+Object_3 8
+Object_4 16

@@ -25,3 +25,13 @@ int32_t main() {
 		object.show();
 	}
 }
+/*
+input:
+8 5
+
+output:
+16    5
+8    5
+9    6
+14    4
+*/

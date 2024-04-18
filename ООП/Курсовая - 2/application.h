@@ -13,7 +13,7 @@ public:
 	void build_tree_objects(string filename_in);
 	void build_tree_objects();
 	void exec_app(string filename_out);
-	void exec_app();
+	int exec_app();
 
 };
 
