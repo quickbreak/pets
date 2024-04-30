@@ -7,20 +7,28 @@ from random import *
 import sqlite3 as sql
 from bs4 import BeautifulSoup as bs
 import requests
+from googletrans import Translator
 
-# ↓↓↓ Ниже нужно вставить токен, который дал BotFather при регистрации
-# Пример: token = '2007628239:AAEF4ZVqLiRKG7j49EC4vaRwXjJ6DN6xng8'
-token = ""  # <<< Ваш токен
+# Читаю информацию, которую нельзя оставлять при публикации на гитхаб
+private_file = open('private_content.txt', 'r', encoding='utf8')
+token = private_file.readline().split(' ')[0]  # Токен бота
+my_id = private_file.readline().split(' ')[0]  # мой id
+my_teg = private_file.readline().split(' ')[0]  # мой тег (@userteg)
+bandchat_id = private_file.readline().split(' ')[0]  # id чата банды
+bandchatmembers_info = private_file.read()  # Информация о членах чата банды
+private_file.close()
 
 bot = telebot.TeleBot(token)
 
+# Флаги, которые нужны для обработки команд
 adding_a_quote_flag = False
 poetry_flag = False
 get_info_flag = False
 add_user_flag = False
 change_me_flag = False
-"""
+translate_flag = False
 
+'''
 def transform_image(filename):
     # Функция обработки изображения
     source_image = Image.open(filename)
@@ -46,8 +54,7 @@ def resend_photo(message):
     # Не забываем удалять ненужные изображения
     if os.path.exists(filename):
         os.remove(filename)
-
-"""
+'''
 
 
 def oga2wav(filename):
@@ -90,15 +97,19 @@ def download_file(bot, file_id):
 
 @bot.message_handler(commands=["hey"])
 def say_hi(message):
-    if message.from_user.username == "...":
-        bot.send_message(message.chat.id, f"доброе утро, шеф!")
+    if message.from_user.id == my_id:
+        bot.send_message(
+            message.chat.id, f"доброе утро, шеф!"
+        )
     else:
         bot.send_message(
             message.chat.id, f"{message.from_user.first_name} banned. Say bye to him"
         )
     # New Year edition
-    # if message.from_user.username == "...":
-    #     bot.send_message(message.chat.id, f"С новой годой, говнокодер")
+    # if message.from_user.id == my_id:
+    #     bot.send_message(
+    #     message.chat.id, f"С новой годой, говнокодер"
+    #     )
     # else:
     #     bot.send_message(
     #         message.chat.id, f"С новой годой, {message.from_user.first_name}!! :)"
@@ -114,7 +125,24 @@ def reply(message):
         list_w_quotes.append(quote)
 
     bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n\n(с) Jason Statham")
-    
+
+
+@bot.message_handler(commands=["member_list"])
+def reply(message):
+    if message.chat.id == int(bandchat_id):  # чат с друзьями Bollywood
+        if message.from_user.id == my_id:
+            bot.send_message(
+                message.chat.id, f"отправляю, шеф"
+            )
+        bot.send_message(
+            message.chat.id,
+            bandchatmembers_info
+        )
+    else:
+        bot.send_message(
+            message.chat.id, f"доступно только в группе"
+        )
+
 
 # если после вызова poetry не ввели номер, а вызвали
 # следующую команду, он забывает про poetry,
@@ -127,9 +155,13 @@ def reply(message):
     poetry_flag = True
     with open('names_categories.txt', 'r') as file:
         m = file.read()
-    bot.send_message(message.chat.id, m)  # отправляем пользователю список имён/праздников
-    bot.send_message(message.chat.id, f'Могу предложить вам стихотворения по такми темам. '
-                                      f'Отправьте номер выбранной темы в ответ')
+    bot.send_message(
+        message.chat.id, m
+    )  # отправляем пользователю список имён/праздников
+    bot.send_message(
+        message.chat.id, f'Могу предложить вам стихотворения по такми темам. '
+                         f'Отправьте номер выбранной темы в ответ'
+    )
     # дальше в content_types=["text"]
 
     # выход из команды
@@ -137,7 +169,7 @@ def reply(message):
 
 
 # отключил. На постоянке она не нужна. Хочешь добавить цитат - включай, добавляй и отключай вновь
-@bot.message_handler(commands=["addind_a_quote"])  # добавить цитату
+'''@bot.message_handler(commands=["addind_a_quote"])  # добавить цитату
 def reply(message):
     # вход в команду
     global adding_a_quote_flag
@@ -146,21 +178,23 @@ def reply(message):
     # дальше в content_types=["text"]
 
     # выход из команды
-    # adding_a_quote_flag = False
+    # adding_a_quote_flag = False'''
 
 
 @bot.message_handler(commands=["call_developer"])  # написать разрабу
 def reply(message):
-    bot.send_message(message.chat.id, f'ник разработчика: ...\nмогу подсказать, с чего начать:\n'
-                                      f'"привет, Миша! Когда выйдешь на работу?.."')
+    bot.send_message(
+        message.chat.id, f'тег разработчика: {my_teg}\nмогу подсказать, с чего начать:\n'
+                         f'"привет, Миша! Когда выйдешь на работу?.."'
+    )
 
 
-class databaseclass(object):
+class DataBaseClass(object):
     @staticmethod
     def add_user(info: str, my_username: str):
         connection = sql.connect('database.db')
         cursor = connection.cursor()
-        error = 'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику ... об ошибке'
+        error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
         data = [x for x in info.split('\n')]
         try:
             cursor.execute('INSERT OR REPLACE INTO Users (id, username, fullname, phone, birthdate, contactslist) '
@@ -175,10 +209,11 @@ class databaseclass(object):
             connection.close()
             return error
 
-    def change_me(self, info: str, my_username: str):
+    @staticmethod
+    def change_me(info: str, my_username: str):
         connection = sql.connect('database.db')
         cursor = connection.cursor()
-        error = 'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику ... об ошибке'
+        error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
         # info += '\n-'
         data = [x for x in info.split('\n')]
         list_of_contacts = '-'
@@ -309,7 +344,7 @@ def reply(message):
     exit_code = database.print_contacts_list(message, str(message.from_user.username))
     if exit_code == 1:
         bot.send_message(message.chat.id, f'Не удалось высвесит список ваших контактов. '
-                                          f'Пожалуйста, сообщите разработчику ... об ошибке')
+                                          f'Пожалуйста, сообщите разработчику {my_teg} об ошибке')
     else:
         bot.send_message(message.chat.id, f'Выберите Идентификатор пользователя, данные которого хотите вспомнить')
 
@@ -320,13 +355,31 @@ def reply(message):
     exit_code = database.print_contacts_list(message, str(message.from_user.username))
     if exit_code == 1:
         bot.send_message(message.chat.id, f'Не удалось высвести список ваших контактов. '
-                                          f'Пожалуйста, сообщите разработчику ... об ошибке')
+                                          f'Пожалуйста, сообщите разработчику {my_teg} об ошибке')
+
+
+def translate_text(text: str):
+    translator = Translator()
+    assert isinstance(text, str)
+    if text.isascii():
+        translation = translator.translate(text, src='en', dest='ru')
+        return translation.text
+    else:
+        translation = translator.translate(text, src='ru', dest='en')
+        return translation.text
+
+
+@bot.message_handler(commands=["translate"])  # переводчик хухл
+def reply(message):
+    global translate_flag
+    translate_flag = True
+    bot.send_message(message.chat.id, f'Какой текст перевести?')
 
 
 @bot.message_handler(content_types=["text"])
 def reply(message):
     message_text = str(message.text)
-    global poetry_flag, adding_a_quote_flag, get_info_flag, add_user_flag, change_me_flag
+    global poetry_flag, adding_a_quote_flag, get_info_flag, add_user_flag, change_me_flag, translate_flag
     if False:
         pass
 
@@ -336,13 +389,9 @@ def reply(message):
             with open('links_by_names_categories.txt', 'r') as file:
                 links_list = file.read().split('\n')
             link = links_list[i - 1]
-            # print(type(link))
             r = requests.get(link)
-            # print(r.status_code)
             soup = bs(r.content, "html.parser")
-            # print(soup.a)
             poetry_list = soup.find_all(class_='sfst')
-            # print(len(poetry_list))
             for poetry in poetry_list[:2]:
                 bot.send_message(message.chat.id, poetry.text.
                                  replace('.', '.\n').
@@ -359,7 +408,6 @@ def reply(message):
                                               f'Попробуйте снова :)\n'
                                               f'*Подсказка: номер - число из отрезка [1, 271]')
 
-
     elif adding_a_quote_flag:
         with open('quotes.txt', 'a', encoding='utf8') as file_w_quotes:
             file_w_quotes.write('\n' + message_text)
@@ -367,7 +415,6 @@ def reply(message):
         bot.send_message(message.chat.id, f'done')
         # выход из команды poetry
         adding_a_quote_flag = False
-
 
     elif add_user_flag:
         database = databaseclass()
@@ -383,7 +430,6 @@ def reply(message):
 
         change_me_flag = False
 
-
     elif get_info_flag:
         database = databaseclass()
         info = database.get_info(str(message.from_user.username), message.text)
@@ -396,10 +442,11 @@ def reply(message):
 
         get_info_flag = False
 
+    elif translate_flag:
+        translated_text = translate_text(message.text)
+        bot.send_message(message.chat.id, translated_text)
 
-
-    elif 'Стих\n' in message_text:
-        bot.send_message(message.chat.id, f"{message.from_user.first_name} Любитель Овсяных Хлопьев!")
+        translate_flag = False
 
 
 @bot.message_handler(content_types=["voice"])
