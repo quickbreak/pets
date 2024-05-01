@@ -79,6 +79,7 @@ public:
 			}
 			current = current->next;
 		}
+		return NULL;
 	};
 
 	// удаление элемента по значению, если такой есть, первого по порядку
@@ -245,6 +246,7 @@ int main() {
 	// ТЕСТ ERASE и FIND
 	/*linkedlist a;
 	a.push_front(1);
+	cout << a.find(3)->value;
 	a.push_front(2);
 	a.push_front(3);
 	a.print();
@@ -275,8 +277,8 @@ int main() {
 	a.print();
 	p = a.find(2);
 	if (p != NULL)
-		cout << p->value << '\n';*/
-
+		cout << p->value << '\n';
+		*/
 
 		// ТЕСТ fill и fill_auto
 		/*cout << "Миха\n";
