@@ -192,7 +192,7 @@ def reply(message):
 class DataBaseClass(object):
     @staticmethod
     def add_user(info: str, my_username: str):
-        connection = sql.connect('database.db')
+        connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
         error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
         data = [x for x in info.split('\n')]
@@ -211,7 +211,7 @@ class DataBaseClass(object):
 
     @staticmethod
     def change_me(info: str, my_username: str):
-        connection = sql.connect('database.db')
+        connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
         error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
         # info += '\n-'
@@ -250,7 +250,7 @@ class DataBaseClass(object):
 
     @staticmethod
     def get_info(my_username: str, id_number: str):
-        connection = sql.connect('database.db')
+        connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
         info = 'Идентификатор введён с ошибкой, или у Вас нет доступа к данным этого пользователя'
         able = False
@@ -290,7 +290,7 @@ class DataBaseClass(object):
 
     @staticmethod
     def print_contacts_list(message, my_username: str):
-        connection = sql.connect('database.db')
+        connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
         error = 1
         try:
@@ -312,6 +312,21 @@ class DataBaseClass(object):
             connection.close()
             return error
 
+    @staticmethod
+    def get_my_info(my_username: str):
+        info = 'ok'
+        connection = sql.connect('database_bot.db')
+        cursor = connection.cursor()
+        try:
+            cursor.execute(f'Select * from Users where username = "{my_username}"')
+            info = cursor.fetchone()
+            info = list(info)
+        except sql.Error as e:
+            info = 'Не удалось найти запись с вашим именем пользователя...'
+        connection.close()
+
+        return info
+
 
 @bot.message_handler(commands=["add_user"])  # добавить нового пользователя
 def reply(message):
@@ -323,14 +338,24 @@ def reply(message):
                                       f'Номер телефона\nДата рождения\nСписок знакомых (идентификаторы через пробел)')
 
 
-@bot.message_handler(commands=["change_me"])  # добавить нового пользователя
+@bot.message_handler(commands=["change_me"])  # изменить информацию о себе
 def reply(message):
     global change_me_flag
     change_me_flag = True
+    database = DataBaseClass()
+    info = database.get_my_info(message.from_user.username)
+
+    if isinstance(info, list):
+        bot.send_message(message.chat.id, f'Вот что известно про вас сейчас:\n'
+                                          f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
+                                          f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
+    else:
+        bot.send_message(message.chat.id, info)
+
     bot.send_message(message.chat.id, f'Введите обновлённую информацию, каждый пункт с новой строки. '
                                       f'Если не хотите что-то указывать, напишите "-" в соответствующей строке. '
-                                      f'Строки: \nИдентификатор (число)\nНикнейм\nИмя (фамилия, отчество)\n'
-                                      f'Номер телефона\nДата рождения')
+                                      f'Строки: \n1. Идентификатор (число)\n2. Никнейм\n3. Имя (фамилия, отчество)\n'
+                                      f'4. Номер телефона\n5. Дата рождения')
 
 
 @bot.message_handler(commands=["get_info"])  # вспомнить контакт
@@ -340,7 +365,7 @@ def reply(message):
     get_info_flag = True
 
     # отправляем запросившему список доступных ему контактов
-    database = databaseclass()
+    database = DataBaseClass()
     exit_code = database.print_contacts_list(message, str(message.from_user.username))
     if exit_code == 1:
         bot.send_message(message.chat.id, f'Не удалось высвесит список ваших контактов. '
@@ -351,7 +376,7 @@ def reply(message):
 
 @bot.message_handler(commands=["contacts_list"])  # список контактов
 def reply(message):
-    database = databaseclass()
+    database = DataBaseClass()
     exit_code = database.print_contacts_list(message, str(message.from_user.username))
     if exit_code == 1:
         bot.send_message(message.chat.id, f'Не удалось высвести список ваших контактов. '
@@ -417,24 +442,24 @@ def reply(message):
         adding_a_quote_flag = False
 
     elif add_user_flag:
-        database = databaseclass()
+        database = DataBaseClass()
         result = database.add_user(message.text, str(message.from_user.username))
         bot.send_message(message.chat.id, f'{result}')
 
         add_user_flag = False
 
     elif change_me_flag:
-        database = databaseclass()
+        database = DataBaseClass()
         result = database.change_me(message.text, str(message.from_user.username))
         bot.send_message(message.chat.id, f'{result}')
 
         change_me_flag = False
 
     elif get_info_flag:
-        database = databaseclass()
+        database = DataBaseClass()
         info = database.get_info(str(message.from_user.username), message.text)
         if isinstance(info, list):
-            bot.send_message(message.chat.id, f'Вот что известно про этого человека:\n\n'
+            bot.send_message(message.chat.id, f'Вот что известно про этого человека:\n'
                                               f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
                                               f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
         else:
