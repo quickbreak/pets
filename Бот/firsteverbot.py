@@ -12,8 +12,8 @@ from googletrans import Translator
 # Читаю информацию, которую нельзя оставлять при публикации на гитхаб
 private_file = open('private_content.txt', 'r', encoding='utf8')
 token = private_file.readline().split(' ')[0]  # Токен бота
-my_id = private_file.readline().split(' ')[0]  # мой id
-my_teg = private_file.readline().split(' ')[0]  # мой тег (@userteg)
+boss_id = private_file.readline().split(' ')[0]  # мой id
+boss_teg = private_file.readline().split(' ')[0]  # мой тег (@userteg)
 bandchat_id = private_file.readline().split(' ')[0]  # id чата банды
 bandchatmembers_info = private_file.read()  # Информация о членах чата банды
 private_file.close()
@@ -97,7 +97,7 @@ def download_file(bot, file_id):
 
 @bot.message_handler(commands=["hey"])
 def say_hi(message):
-    if message.from_user.id == my_id:
+    if message.from_user.id == boss_id:
         bot.send_message(
             message.chat.id, f"доброе утро, шеф!"
         )
@@ -106,7 +106,7 @@ def say_hi(message):
             message.chat.id, f"{message.from_user.first_name} banned. Say bye to him"
         )
     # New Year edition
-    # if message.from_user.id == my_id:
+    # if message.from_user.id == boss_id:
     #     bot.send_message(
     #     message.chat.id, f"С новой годой, говнокодер"
     #     )
@@ -124,13 +124,13 @@ def reply(message):
     for quote in s:
         list_w_quotes.append(quote)
 
-    bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n\n(с) Jason Statham")
+    bot.send_message(message.chat.id, f"{choice(list_w_quotes)}\n(с) Jason Statham")
 
 
 @bot.message_handler(commands=["member_list"])
 def reply(message):
     if message.chat.id == int(bandchat_id):  # чат с друзьями Bollywood
-        if message.from_user.id == my_id:
+        if message.from_user.id == boss_id:
             bot.send_message(
                 message.chat.id, f"отправляю, шеф"
             )
@@ -184,7 +184,7 @@ def reply(message):
 @bot.message_handler(commands=["call_developer"])  # написать разрабу
 def reply(message):
     bot.send_message(
-        message.chat.id, f'тег разработчика: {my_teg}\nмогу подсказать, с чего начать:\n'
+        message.chat.id, f'тег разработчика: {boss_teg}\nмогу подсказать, с чего начать:\n'
                          f'"привет, Миша! Когда выйдешь на работу?.."'
     )
 
@@ -194,7 +194,7 @@ class DataBaseClass(object):
     def add_user(info: str, my_username: str):
         connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
-        error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
+        error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {boss_teg} об ошибке'
         data = [x for x in info.split('\n')]
         try:
             cursor.execute('INSERT OR REPLACE INTO Users (id, username, fullname, phone, birthdate, contactslist) '
@@ -213,119 +213,136 @@ class DataBaseClass(object):
     def change_me(info: str, my_username: str):
         connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
-        error = f'Что-то пошло не по плану...\nПожалуйста, сообщите разработчику {my_teg} об ошибке'
-        # info += '\n-'
-        data = [x for x in info.split('\n')]
-        list_of_contacts = '-'
-        try:
-            cursor.execute(f'select contactslist from Users where username = "{my_username}"')
-            list_of_contacts = cursor.fetchone()
-            list_of_contacts = str(list_of_contacts)[2:-3]
-            error = '0'
-        except Exception as e:
-            error = 'Вы кто такие? я вас не знаю'
 
-        if error != '0':
+        error, my_id = DataBaseClass.get_id(my_username, my_username)
+        if error != 'ok':
             return error
+        data = list([x for x in info.split('\n')])
+        data.insert(0, int(my_id))
 
-        # если удалось извлечь список контактов
-        data.append(list_of_contacts)
-        try:
-            if data[1] == my_username:
+        if data[1] == my_username:
+            try:
                 cursor.execute(f'insert or replace into Users'
-                               f'(id, username, fullname, phone, birthdate, contactslist)'
-                               f'VALUES(?, ?, ?, ?, ?, ?)', (int(data[0]), data[1], data[2], data[3], data[4], data[5]))
+                               f'(id, username, name, birthdate)'
+                               f'VALUES({my_id}, "{data[1]}", "{data[2]}", "{data[3]}")')
 
                 error = 'Изменено успешно!'
-            else:
-                error = 'Кажется, это не вы...'
-        except Exception as e:
-            print(e)
-            error = 'Не удалось обновить пользователя. Пожалуйста, введите все перечисленные параметры, каждый с новой строки'
+            except sql.Error as e:
+                error = ('Не удалось обновить пользователя. '
+                         'Пожалуйста, введите все перечисленные параметры, каждый с новой строки')
 
-        finally:
-            connection.commit()
-            connection.close()
-            return error
+            finally:
+                connection.commit()
+                connection.close()
+        else:
+            error = ('Кажется, это не вы (у вас другое имя пользователя в телеграме). '
+                     'Вы можете изменить информацию только о себе')
+
+        return error
 
     @staticmethod
-    def get_info(my_username: str, id_number: str):
+    def get_id(my_username: str, username: str):
         connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
-        info = 'Идентификатор введён с ошибкой, или у Вас нет доступа к данным этого пользователя'
-        able = False
+        error = 'ok'
+        user_id = ''
+        list_of_contacts = ''
         try:
-            cursor.execute(f'select contactslist from Users where username = "{my_username}"')
-            list_of_contacts = cursor.fetchone()
-            list_of_contacts = str(list_of_contacts)[2:-3].split()
-            if id_number in list_of_contacts:
-                able = True
+            cursor.execute(f'select id from Users where username = "{username}"')
+            user_id = str(cursor.fetchone())[1:-2]
+            cursor.execute(f'select id from Users where username = "{my_username}"')
+            my_id = str(cursor.fetchone())[1:-2]
+            cursor.execute(f'select list_of_contacts from Contacts where id = "{my_id}"')
+            list_of_contacts = list(str(cursor.fetchone())[2:-3].split())
         except sql.Error as e:
-            info = 'Вас найти не смог'
-
-        # anyway
-        finally:
-            connection.commit()
-        # если нет доступа
-        if not able:
-            connection.close()
-            return info
-
-        # если доступ есть
-        try:
-            cursor.execute(f'Select * from Users where id = {id_number}')
-            info = cursor.fetchone()
-            info = list(info)
-        except sql.Error as e:
-            info = 'Не удалось найти пользователя. Проверьте, правильно ли вы ввели идентификатор(id)'
+            error = 'Произошла ошибка во время извлечения информации'
 
         # anyway
         finally:
             connection.commit()
             connection.close()
-            return info
 
-        # обязательно в любом случае
-        # connection.close()
+        if user_id not in list_of_contacts and user_id + ',' not in list_of_contacts:
+            error = 'Кажется, этот пользователь запретил вам просматривать информацию о нём'
+
+        return error, user_id
 
     @staticmethod
-    def print_contacts_list(message, my_username: str):
+    def get_info(my_username: str, username: str):
+        info = ''
+
+        error, user_id = DataBaseClass.get_id(my_username, username)
+        if error != 'ok':
+            return error, info
+
         connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
-        error = 1
         try:
-            cursor.execute(f'select contactslist from Users where username = "{my_username}"')
+            cursor.execute(f'select * from Users where id = "{user_id}"')
+            info = list(cursor.fetchone())
+        except sql.Error as e:
+            error = 'Произошла ошибка во время извлечения информации'
+        # anyway
+        finally:
+            connection.commit()
+            connection.close()
+            return error, info
+
+    @staticmethod
+    def get_list_of_my_contacts(message, my_username: str):
+        connection = sql.connect('database_bot.db')
+        cursor = connection.cursor()
+        error = 'ok'
+        answer = ''
+        try:
+            cursor.execute(f'select id from Users where username = "{my_username}"')
+            my_id = str(cursor.fetchone())[1:-2]
+        except Exception as e:  # если пользователя my_username нет в базе данных, то дальше программа идти не должна
+            error = 'Не удалось найти пользователя с вашим телеграм-тегом'
+            connection.commit()
+            connection.close()
+            return error, answer
+
+        # если пользователь my_username есть в базе данных
+        try:
+            cursor.execute(f'select list_of_contacts from Contacts where id = "{int(my_id)}"')
             list_of_contacts = cursor.fetchone()
             list_of_contacts = str(list_of_contacts)[2:-3].split()
-            answer = ''
+
             for id_number in list_of_contacts:
-                cursor.execute(f'select fullname from Users where id = {int(id_number)}')
+                id_number = str(id_number).replace(',', '')
+                cursor.execute(f'select username from Users where id = {int(id_number)}')
+                username = cursor.fetchone()
+                cursor.execute(f'select name from Users where id = {int(id_number)}')
                 name = cursor.fetchone()
-                answer += f'{id_number} {str(name)[2:-3]}' + '\n'
-            bot.send_message(message.chat.id, answer)
-            error = 0
+                answer += f'{str(name)[2:-3]} @{str(username)[2:-3]}' + '\n'
+            return error, answer
         except Exception as e:
-            error = 1
-
+            error = 'Приносим извинения: произошла ошибка по время извлечения ваших контактов'
         finally:
             connection.commit()
             connection.close()
-            return error
+            return error, answer
 
     @staticmethod
     def get_my_info(my_username: str):
-        info = 'ok'
+        error = 'ok'
+        info = ''
         connection = sql.connect('database_bot.db')
         cursor = connection.cursor()
         try:
             cursor.execute(f'Select * from Users where username = "{my_username}"')
             info = cursor.fetchone()
-            info = list(info)
+            if info is None:
+                error = 'Не удалось найти запись с вашим именем пользователя...'
+            else:
+                info = list(info)
         except sql.Error as e:
-            info = 'Не удалось найти запись с вашим именем пользователя...'
-        connection.close()
-
-        return info
+            error = 'Не удалось найти запись с вашим именем пользователя...'
+        finally:
+            connection.commit()
+            connection.close()
+            return error, info
 
 
 @bot.message_handler(commands=["add_user"])  # добавить нового пользователя
@@ -334,7 +351,7 @@ def reply(message):
     add_user_flag = True
     bot.send_message(message.chat.id, f'Введите информацию о пользователе, каждый пункт с новой строки. '
                                       f'Если не хотите что-то указывать, напишите "-" в соответствующей строке. '
-                                      f'Строки: \nИдентификатор (число)\nНикнейм\nИмя (фамилия, отчество)\n'
+                                      f'Строки: \nИдентификатор (число)\nТелеграм-тег\nИмя (фамилия, отчество)\n'
                                       f'Номер телефона\nДата рождения\nСписок знакомых (идентификаторы через пробел)')
 
 
@@ -342,45 +359,52 @@ def reply(message):
 def reply(message):
     global change_me_flag
     change_me_flag = True
+
     database = DataBaseClass()
-    info = database.get_my_info(message.from_user.username)
+    error, info = database.get_my_info(message.from_user.username)
 
-    if isinstance(info, list):
+    # если инфоррмация о пользователе извлеклась без ошибки
+    if error == 'ok':
         bot.send_message(message.chat.id, f'Вот что известно про вас сейчас:\n'
-                                          f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
-                                          f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
+                                          f'Телеграм: @{info[1]}\nЗовут: {info[2]}\n'
+                                          f'Дата рождения: {info[3]}')
+
+        bot.send_message(message.chat.id, f'Введите обновлённую информацию, каждый пункт с новой строки без цифр. '
+                                          f'\nЕсли не хотите что-то указывать, напишите "-" в соответствующей строке. '
+                                          f'Строки:\n1. Телеграм-тег\n2. Имя\n3. Дата рождения')
+    # если при извлечении информации о пользователе возникла ошибка
     else:
-        bot.send_message(message.chat.id, info)
-
-    bot.send_message(message.chat.id, f'Введите обновлённую информацию, каждый пункт с новой строки. '
-                                      f'Если не хотите что-то указывать, напишите "-" в соответствующей строке. '
-                                      f'Строки: \n1. Идентификатор (число)\n2. Никнейм\n3. Имя (фамилия, отчество)\n'
-                                      f'4. Номер телефона\n5. Дата рождения')
+        bot.send_message(message.chat.id, error)
 
 
-@bot.message_handler(commands=["get_info"])  # вспомнить контакт
+@bot.message_handler(commands=["get_info"])  # получить информацию о контакте
 def reply(message):
     global get_info_flag
+
+    # попытка отправления запросившему списка доступных ему контактов
+    database = DataBaseClass()
+    error, info = database.get_list_of_my_contacts(message, str(message.from_user.username))
+
+    if error == 'ok':  # если список контактов успешно извлечён
+        bot.send_message(message.chat.id, f'Вот список ваших контактов:\n{info}')  # отправляются его контакты
+        bot.send_message(message.chat.id,
+                         f'Напишите в ответ телеграм-тег (@ перед ним писать не надо), данные которого хотите вспомнить')
+    else:
+        bot.send_message(massage.chat.id, error)
+
     # вход
     get_info_flag = True
 
-    # отправляем запросившему список доступных ему контактов
-    database = DataBaseClass()
-    exit_code = database.print_contacts_list(message, str(message.from_user.username))
-    if exit_code == 1:
-        bot.send_message(message.chat.id, f'Не удалось высвесит список ваших контактов. '
-                                          f'Пожалуйста, сообщите разработчику {my_teg} об ошибке')
-    else:
-        bot.send_message(message.chat.id, f'Выберите Идентификатор пользователя, данные которого хотите вспомнить')
 
-
-@bot.message_handler(commands=["contacts_list"])  # список контактов
+@bot.message_handler(commands=["contacts_list"])  # список контактов запросившего
 def reply(message):
     database = DataBaseClass()
-    exit_code = database.print_contacts_list(message, str(message.from_user.username))
-    if exit_code == 1:
-        bot.send_message(message.chat.id, f'Не удалось высвести список ваших контактов. '
-                                          f'Пожалуйста, сообщите разработчику {my_teg} об ошибке')
+    error, info = database.get_list_of_my_contacts(message, str(message.from_user.username))
+
+    if error == 'ok':  # если список контактов успешно извлечён
+        bot.send_message(message.chat.id, f'Вот список ваших контактов:\n{info}')
+    else:
+        bot.send_message(message.chat.id, error)
 
 
 def translate_text(text: str):
@@ -450,20 +474,20 @@ def reply(message):
 
     elif change_me_flag:
         database = DataBaseClass()
-        result = database.change_me(message.text, str(message.from_user.username))
-        bot.send_message(message.chat.id, f'{result}')
+        error = database.change_me(message.text, str(message.from_user.username))
+        bot.send_message(message.chat.id, error)
 
         change_me_flag = False
 
     elif get_info_flag:
         database = DataBaseClass()
-        info = database.get_info(str(message.from_user.username), message.text)
-        if isinstance(info, list):
+        error, info = database.get_info(str(message.from_user.username), message.text)
+        if error == 'ok':
             bot.send_message(message.chat.id, f'Вот что известно про этого человека:\n'
-                                              f'Никнейм: {info[1]}\nЗовут: {info[2]}\n'
-                                              f'Телефон: {info[3]}\nДата рождения: {info[4]}\n')
+                                              f'Телеграм-тег: @{info[1]}\nЗовут: {info[2]}\n'
+                                              f'Дата рождения: {info[3]}\n')
         else:
-            bot.send_message(message.chat.id, info)
+            bot.send_message(message.chat.id, error)
 
         get_info_flag = False
 
