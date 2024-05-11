@@ -5,6 +5,7 @@
 
 class node_3 final : public tree_base{
 public:
+
 	// node_3(tree_base* p_head_object, string s_object_name = "Base_object");
 
 	using tree_base::tree_base;

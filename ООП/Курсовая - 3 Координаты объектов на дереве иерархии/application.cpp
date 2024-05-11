@@ -4,90 +4,10 @@
 #include "node_4.h"
 #include "node_5.h"
 #include "node_6.h"
-#include <iostream>
+
 
 //application::application(tree_base * p_head_object, const string s_object_name): tree_base(p_head_object,s_object_name){};
 
-int application::exec_app() {
-	string command = "";
-	tree_base* currentobjptr = this;
-	while (true) {
-		cin >> command;
-		if (command == "END") {
-			cout << "\nCurrent object hierarchy tree";
-			this->print_tree();
-			break;
-		}
-		if (command == "SET") {
-			string path; cin >> path;
-			currentobjptr = currentobjptr->get_object(path);
-			if (currentobjptr != NULL)
-				cout << "\nObject is set: " << currentobjptr->get_my_name();
-			else
-				cout << "\nThe object was not found at the specified coordinate: " << path;
-		}
-		else if (command == "FIND") {
-			string path; cin >> path;
-			tree_base* objptr = currentobjptr->get_object(path);
-			cout << '\n' << path << "     ";
-			if (objptr != NULL)
-				cout << "Object name: " << objptr->get_my_name();
-			else
-				cout << "Object is not found";
-		}
-		else if (command == "MOVE") {	
-			string path; cin >> path;
-			tree_base* newparentobjptr = currentobjptr->get_object(path);
-
-			// родительский объект вообще не найден
-			if (newparentobjptr == NULL) {
-				cout << '\n' << path << "     " << "Head object is not found";
-				continue;
-			}
-			if (currentobjptr->change_my_parent(newparentobjptr)) {
-				cout << "\nNew head object: " << (currentobjptr->get_my_parent()->get_my_name());
-				continue;
-			}
-			else {
-				// нельзя прикрепиться к newparent, потому что
-				// у него есть НЕПОСРЕДСТВЕННЫЙ потомок с таким же именем, как у текущего 
-				if (newparentobjptr->get_my_child(currentobjptr->get_my_name())) {
-					cout << '\n' << path << "     " << "Dubbing the names of subordinate objects";
-					continue;
-				}
-				// нельзя, чтобы новым родителем был потомок текущего
-				if (currentobjptr->find_by_name_down(newparentobjptr->get_my_name()) != NULL) {
-					cout << '\n' << path << "     " << "Redefining the head object failed";
-					continue;
-				}
-				// else
-				cout << '\n' << path << "     " << "Redefining the head object failed";
-			}
-		}
-		else if (command == "DELETE") {
-			string childname; cin >> childname;
-
-			// проверяем, удастся ли удалить
-			tree_base* removeptr = currentobjptr->get_my_child(childname);
-			// если нашли объект с таким именем, значит удалим
-			if (removeptr != NULL) {
-				// удаляем
-				currentobjptr->remove_my_child(childname);
-				// выводим сообщение об успехе
-				const tree_base* objptr = removeptr;
-				string absolutepath = "";
-				while (objptr->get_my_parent() != NULL) {
-					absolutepath = "/" + objptr->get_my_name() + absolutepath;
-					objptr = objptr->get_my_parent();
-				}
-				cout << "\nThe object " << absolutepath << " has been deleted";
-			}
-		}
-
-	}
-
-	return 0;
-}
 
 void application::build_tree_objects() {
 	string path, childname; // путь, имя нового объекта
@@ -105,7 +25,7 @@ void application::build_tree_objects() {
 
 		
 		tree_base* parent = this->get_object(path); // ищем родителя
-		if (parent == NULL) { // если не нашли родителя, дерево дальше не собирается, гг вп
+		if (parent == NULL) { // если не нашли родителя, дерево дальше не собирается
 			cout << "Object tree";
 			this->print_tree();
 			cout << "\nThe head object " << path << " is not found";
@@ -139,4 +59,84 @@ void application::build_tree_objects() {
 
 	cout << "Object tree";
 	this->print_tree();
+}
+
+
+int application::exec_app() {
+	string command, path;
+	tree_base* currentobjptr = this;
+	while (true) {
+		cin >> command;
+		if (command == "END") {
+			cout << "\nCurrent object hierarchy tree";
+			this->print_tree();
+			break;
+		}
+		if (command == "SET") {
+			cin >> path;
+			currentobjptr = currentobjptr->get_object(path);
+			if (currentobjptr != NULL)
+				cout << "\nObject is set: " << currentobjptr->get_my_name();
+			else
+				cout << "\nThe object was not found at the specified coordinate: " << path;
+		}
+		else if (command == "FIND") {
+			cin >> path;
+			tree_base* objptr = currentobjptr->get_object(path);
+			cout << '\n' << path << "     ";
+			if (objptr != NULL)
+				cout << "Object name: " << objptr->get_my_name();
+			else
+				cout << "Object is not found";
+		}
+		else if (command == "MOVE") {
+			cin >> path;
+			tree_base* newparentobjptr = currentobjptr->get_object(path);
+
+			// родительский объект вообще не найден
+			if (newparentobjptr == NULL) {
+				cout << '\n' << path << "     " << "Head object is not found";
+				continue;
+			}
+			if (currentobjptr->change_my_parent(newparentobjptr)) {
+				cout << "\nNew head object: " << (currentobjptr->get_my_parent()->get_my_name());
+				continue;
+			}
+			else {
+				// нельзя прикрепиться к newparent, потому что
+				// у него есть НЕПОСРЕДСТВЕННЫЙ потомок с таким же именем, как у текущего 
+				if (newparentobjptr->get_my_child(currentobjptr->get_my_name())) {
+					cout << '\n' << path << "     " << "Dubbing the names of subordinate objects";
+					continue;
+				}
+				cout << '\n' << path << "     " << "Redefining the head object failed";
+			}
+		}
+		else if (command == "DELETE") {
+			string childname; cin >> childname;
+
+			// проверка, удастся ли удалить
+			tree_base* removeptr = currentobjptr->get_my_child(childname);
+			// если нашёлся объект с именем childname, его нужно удалить
+			if (removeptr != NULL) {
+				// собирается absolutepath
+				const tree_base* objptr = removeptr;
+				string absolutepath = "";
+				while (objptr->get_my_parent() != NULL) {
+					absolutepath = "/" + objptr->get_my_name() + absolutepath;
+					objptr = objptr->get_my_parent();
+				}
+
+				// удаление объекта
+				currentobjptr->remove_my_child(childname);
+
+				// вывод сообщения об успешном удалении
+				cout << "\nThe object " << absolutepath << " has been deleted";
+
+			}
+		}
+
+	}
+
+	return 0;
 }

@@ -1,6 +1,4 @@
 #include "tree_base.h"
-#include <iostream>
-#include <queue>
 
 
 tree_base::tree_base(tree_base* p_head_object, const string s_object_name) : 
@@ -34,24 +32,24 @@ tree_base* tree_base::get_my_child(const string child_name) {
 			return child;
 		}
 	}
+
 	return NULL;
 }
 
 
-bool tree_base::is_new_name(const string new_name) {
-
-	return (this->find_by_name(new_name) == NULL);
-}
-
-
 bool tree_base::change_my_name(const string new_name) {
-	// если имя new_name не занято, 
-	// могу так назваться
-	if (this->is_new_name(new_name)) {
-		this->s_object_name = new_name;
-		return true;
+	// если у объекта есть sibling с именем new_name,
+	// его нельзя назвать так же
+	if (this->get_my_parent() != NULL) { // если у объекта есть родитель
+		auto children = this->get_my_parent()->subordinate_objects;
+		for (auto child : children) { // то надо проверить всех непосредственных потомков родителя
+			if (child->s_object_name == new_name)
+				return false;
+		}
 	}
-	else return false;
+
+	this->s_object_name = new_name;
+	return true;
 }
 
 
@@ -145,7 +143,7 @@ tree_base* tree_base::find_by_name_down(const string name) {
 	// непосредственные потомки текущего
 	tree_base* found = NULL;
 	for (auto& child : this->subordinate_objects) {
-		found = child->find_by_name_down(name);
+		found = child->find_by_name_down(name); // вызов метода от каждого из непосредственных потомков
 		// если нашли объект с таким именем
 		if (found != NULL)
 			return found;
@@ -186,7 +184,8 @@ void tree_base::remove_my_child(const string childname) {
 			break;
 		}
 	}
-	if (it != children.end()) // если есть непосредственные потомки с именем childname
+	if (it != children.end()) // если есть непосредственный потомок с именем childname 
+		// (гарантирована уникальность имён среди объектов с одинаковым головным объектом (родителем))
 		children.erase(it); // то удаляем первый по порядку такой объект
 
 }
@@ -199,9 +198,24 @@ bool tree_base::change_my_parent(tree_base* newparent) {
 	// второго корня быть не может
 	if (newparent == NULL)
 		return false;
-	// нельзя, чтобы новым родителем был потомок текущего
-	if (this->find_by_name_down(newparent->get_my_name()) != NULL)
-		return false;
+	// нельзя, чтобы новым родителем был потомок текущего.
+	// Здесь проверяется наличие именно объекта newparent,
+	// имя, как у newparent, спокойно может встречаться 
+	// среди потомков текущего объекта
+	vector<tree_base*>children;
+	queue<tree_base*>q; // очередь
+	tree_base* objptr = this;
+	q.push(objptr); // кладём текущий объект 
+	while (q.size() > 0) {
+		objptr = q.front(); // переходим к очередному объекту
+		if (objptr == newparent) // проверяем его самого
+			return false;
+		children = objptr->subordinate_objects;
+		for (tree_base* child : children) // кладём в очередь его потомков
+			q.push(child);
+
+		q.pop();
+	}
 	// нельзя прикрепиться к newparent, если у него есть НЕПОСРЕДСТВЕННЫЙ потомок с таким же именем, как у текущего 
 	if (newparent->get_my_child(this->get_my_name()))
 		return false;
@@ -223,7 +237,7 @@ tree_base* tree_base::get_object(const string path) {
 		return NULL;
 
 	if (path == "/") { // корень дерева
-		// find root
+		// поднимаемся до корня
 		tree_base* objptr = this;
 		while (objptr->p_head_object != NULL) {
 			objptr = objptr->p_head_object;
@@ -246,7 +260,7 @@ tree_base* tree_base::get_object(const string path) {
 
 		}
 
-		// проверяем уникальность (bfs)
+		// проверяем уникальность имени 
 		vector<tree_base*>children, candidates;
 		queue<tree_base*>q; // очередь
 		q.push(objptr); // кладём корень 
@@ -271,7 +285,7 @@ tree_base* tree_base::get_object(const string path) {
 			name += path[i];
 		}
 
-		// проверяем уникальность (bfs)
+		// проверяем уникальность имени
 		tree_base* objptr;
 		vector<tree_base*>children, candidates;
 		queue<tree_base*>q; // очередь
@@ -316,10 +330,10 @@ tree_base* tree_base::get_object(const string path) {
 		// если смогли найти, возвращаем
 		return objptr;
 	}
-	else { // если ничего не помогло, это относительная координата от текущего объекта
+	else { // если никакой другой сценарий не прошёл, это относительная координата от текущего объекта
 		tree_base* objptr = this;
-		int i = 0;
 		string name = "";
+		int i = 0;
 		// пошли по path от текущего
 		while (i < path.size()) {
 			name = "";

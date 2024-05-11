@@ -9,6 +9,19 @@ int main() {
 
 }
 
+/*
+В ДАННОЙ РАБОТЕ УНИКАЛЬНОСТЬ ИМЁН ТРЕБУЕТСЯ СРЕДИ ОБЪЕКТОВ С ОБЩИМ РОДИТЕЛЕМ. То есть
+может быть:
+root
+    abc
+        abc
+            abc
+но не может быть:
+root
+    abc
+        abc abc
+*/
+
 
 /*
 input:
@@ -143,4 +156,17 @@ root
     object_1
 The head object object_4 is not found
 
+
+input:
+root
+endtree
+MOVE object_1
+END
+
+output:
+Object tree
+root
+object_1     Head object is not found
+Current object hierarchy tree
+root
 */

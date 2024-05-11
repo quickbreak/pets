@@ -1,7 +1,9 @@
 #ifndef __TREE_BASE__H
 #define __TREE_BASE__H
-#include <vector>
-#include <string>
+#include<vector>
+#include<string>
+#include<iostream>
+#include<queue>
 
 using namespace std;
 
@@ -29,8 +31,6 @@ public:
 	// возвращает указатель на непосредственного потомка по имени childname.
 	// Гарантируется, что имена непосредственных потомков уникальны
 	tree_base* get_my_child(const string child_name);
-	// уникально ли имя new_name? (на всём дереве)
-	bool is_new_name(const string new_name);
 	// выводит дерево в глубину
 	void print_tree() const;
 	// устанавливает готовность 
