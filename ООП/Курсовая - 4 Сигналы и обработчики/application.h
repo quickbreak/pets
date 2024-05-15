@@ -20,9 +20,9 @@ public:
 	void signal(std::string&) const override;
 	// метод обработчик
 	void handler(const std::string) const override;
-	// возвращает указатель на сигнал-метод того типа, что и у объекта
+	// возвращает указатель на сигнал-метод того класса, что и у объекта
 	TYPE_SIGNAL get_signal_pointer() const override;
-	// возвращает указатель на хэндлер-метод того типа, что и у объекта
+	// возвращает указатель на хэндлер-метод того класса, что и у объекта
 	TYPE_HANDLER get_handler_pointer() const override;
 
 };

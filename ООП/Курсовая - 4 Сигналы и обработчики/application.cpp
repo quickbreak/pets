@@ -5,8 +5,6 @@
 #include "node_5.h"
 #include "node_6.h"
 
-#include<string>
-
 
 //application::application(tree_base * p_head_object, const std::string s_object_name): tree_base(p_head_object,s_object_name){};
 
@@ -39,7 +37,7 @@ TYPE_HANDLER application::get_handler_pointer() const
 void application::build_tree_objects() 
 {
 	std::string path, childname; // путь, имя нового объекта
-	// узнаём имя корня
+	// чтение имени корня
 	std::cin >> childname;
 	this->change_my_name(childname);
 
@@ -56,8 +54,8 @@ void application::build_tree_objects()
 
 		// проверка, нет ли уже у родителя потомка с нашим именем
 		tree_base* found = parent->get_my_child(childname); 
-		if (!found) { // если наше имя уникально
-			// то создаём новую вершину указанного класса
+		if (!found) { // если имя уникально
+			// то создаётся новая вершина указанного класса с таким именем
 			if (class_number == 2) {
 				node = new node_2(parent, childname);
 			}
@@ -75,9 +73,7 @@ void application::build_tree_objects()
 			}
 		}
 		// иначе объект не создаётся
-		/*else {
-			std::cout << path << "     " << "Dubbing the names of subordinate objects\n";
-		}*/
+		
 	}
 
 	std::cout << "Object tree";
@@ -93,18 +89,10 @@ void application::build_tree_objects()
 		}
 
 		auto object_from = this->get_object(path);
-		/*if (object_from == NULL)
-		{
-			std::cout << "\nObject " << path << " not found";
-			continue;
-		}*/
+		
 		std::cin >> path;
 		auto object_to = this->get_object(path);
-		/*if (object_to == NULL)
-		{
-			std::cout << "\nHandler object " << path << " not found";
-			continue;
-		}*/
+
 		object_from->set_connect(object_from->get_signal_pointer(), object_to, object_from->get_handler_pointer());
 	}
 }
@@ -114,20 +102,16 @@ int application::exec_app()
 {
 	// подъём до корня
 	tree_base* objptr = this;
-	/*while (objptr->get_my_parent() != NULL) {
-		objptr = objptr->get_my_parent();
-
-	}*/
 
 	// все объекты приводятся в состояние готовности 
 	std::vector<tree_base*>children; // список детей
 	std::queue<tree_base*>q; // очередь
 	q.push(objptr); // в очередь кладётся корень 
 	while (q.size() > 0) {
-		objptr = q.front(); // переходим к очередному объекту
+		objptr = q.front(); // переход к очередному объекту
 		objptr->set_my_readiness(1);
 		children = objptr->get_my_subordinate_objects();
-		for (tree_base* child : children) // кладём в очередь его детей
+		for (tree_base* child : children) // в очередь кладутся его дети
 			q.push(child);
 
 		q.pop();
@@ -146,7 +130,7 @@ int application::exec_app()
 		{
 			std::cin >> path;
 			int code; std::cin >> code;
-			auto object = this->get_object(path);
+			tree_base* object = this->get_object(path);
 			if (object == NULL)
 			{
 				std::cout << "\nObject " << path << " not found";
@@ -158,7 +142,7 @@ int application::exec_app()
 		{
 			std::cin >> path;
 			getline(std::cin, message);
-			auto object_from = this->get_object(path);
+			tree_base* object_from = this->get_object(path);
 			if (object_from == NULL)
 			{
 				std::cout << "\nObject " << path << " not found";
@@ -169,14 +153,14 @@ int application::exec_app()
 		else if (command == "SET_CONNECT")
 		{
 			std::cin >> path;
-			auto object_from = this->get_object(path);
+			tree_base* object_from = this->get_object(path);
 			if (object_from == NULL)
 			{
 				std::cout << "\nObject " << path << " not found";
 				continue;
 			}
 			std::cin >> path;
-			auto object_to = this->get_object(path);
+			tree_base* object_to = this->get_object(path);
 			if (object_to == NULL)
 			{
 				std::cout << "\nHandler object " << path << " not found";
@@ -187,14 +171,14 @@ int application::exec_app()
 		else if (command == "DELETE_CONNECT")
 		{
 			std::cin >> path;
-			auto object_from = this->get_object(path);
+			tree_base* object_from = this->get_object(path);
 			if (object_from == NULL)
 			{
 				std::cout << "\nObject " << path << " not found";
 				continue;
 			}
 			std::cin >> path;
-			auto object_to = this->get_object(path);
+			tree_base* object_to = this->get_object(path);
 			if (object_to == NULL)
 			{
 				std::cout << "\nHandler object " << path << " not found";

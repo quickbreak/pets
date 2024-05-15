@@ -24,7 +24,7 @@ typedef void (tree_base::* TYPE_HANDLER)(std::string);
 
 class tree_base {
 
-	struct type_connect // Структура, хранящая информациюю о связи (одной)
+	struct type_connect // Структура, хранящая информацию о связи (одной)
 	{
 	public:
 		TYPE_SIGNAL signal_pointer; // Указатель на метод сигнала
@@ -40,7 +40,7 @@ class tree_base {
 		}*/
 	};
 
-	std::vector<type_connect*>connects; // список установленных связей
+	std::vector<type_connect*>connects; // список установленных связей объекта
 
 
 	tree_base* p_head_object; // указатель на предка
@@ -65,8 +65,6 @@ public:
 	tree_base* get_my_child(const std::string child_name);
 	// выводит дерево в глубину
 	void print_tree() const;
-	/*// устанавливает готовность 
-	void set_readiness(const int);*/
 	// выводит дерево с готовностями в глубину
 	void print_tree_with_readiness() const;
 	// возвращает указатель на объект поддерева с именем name (первый в порядке рекурсивного обхода)
@@ -92,13 +90,16 @@ public:
 	void set_my_readiness(const int);
 	// метод разрыва связи
 	void remove_connect(TYPE_SIGNAL signal_pointer, tree_base* target_object_pointer, TYPE_HANDLER handler_pointer);
-	// ну вы пон
-	std::vector<tree_base*>get_my_subordinate_objects() const;
+	// возвращает поле список детей
+	std::vector<tree_base*> get_my_subordinate_objects() const;
+	// каждый класс реализует сигнал по-своему
 	virtual void signal(std::string&) const = 0;
-	virtual void handler(const std::string) const = 0;
-	// возвращает указатель на сигнал-метод того типа, что и у объекта
+	// в этой задаче нет никакого смысла делать метод виртуальным, 
+	// но по идее метод-обработчик должен быть виртуальным
+	virtual void handler(const std::string) const = 0; 
+	// возвращает указатель на сигнал-метод того класса, что и у объекта
 	virtual TYPE_SIGNAL get_signal_pointer() const = 0;
-	// возвращает указатель на хэндлер-метод того типа, что и у объекта
+	// возвращает указатель на хэндлер-метод того класса, что и у объекта
 	virtual TYPE_HANDLER get_handler_pointer() const = 0;
 };
 

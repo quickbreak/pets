@@ -1,15 +1,3 @@
-#include "application.h"
-#include <iostream>
-
-
-int main() {
-	application app(NULL);
-	app.build_tree_objects();
-	return app.exec_app();
-
-}
-
-/*
 input:
 
 appls_root
@@ -76,4 +64,3 @@ Signal to /object_1 Text: message 1 (class: 1)
 Signal to /object_2 Text: message 1 (class: 1)
 Signal from /
 Signal to /object_2 Text: message 2 (class: 1)
-*/

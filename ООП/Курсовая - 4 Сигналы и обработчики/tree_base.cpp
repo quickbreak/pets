@@ -76,38 +76,6 @@ void tree_base::print_tree() const {
 	}
 }
 
-/*
-void tree_base::set_readiness(const int num) {
-	// если это отключение готовности,
-	if (num == 0) {
-		// то отключается этот объект
-		this->readiness = num;
-		// и отключаются все объекты ниже исходного
-		for (auto& child : this->subordinate_objects) {
-			child->set_readiness(num);
-		}
-	}
-	else { // если запрос на включение
-		// надо проверить, готовы ли все объекты вверх по иерархии
-		bool readiness_flag = true;
-		tree_base* p_head = this;
-		while (p_head->p_head_object != NULL) {
-			p_head = p_head->p_head_object;
-			// если хоть один не готов
-			if (p_head->readiness == 0) {
-				// во включении исходного отказано
-				readiness_flag = false;
-				break;
-
-			}
-		}
-		// если все готовы
-		if (readiness_flag)
-			// то и я с ними
-			this->readiness = num;
-	}
-}
-*/
 
 void tree_base::print_tree_with_readiness() const {
 	std::string otstup = "";
@@ -356,9 +324,8 @@ void tree_base::set_connect(TYPE_SIGNAL signal_pointer,
 							tree_base* target_object_pointer, 
 							TYPE_HANDLER handler_pointer) 
 {
-	type_connect* p_value;
-	// Цикл для исключения повторного установления связи
-	for (unsigned int i = 0; i < this->connects.size(); ++i) {
+	// Если такая связь уже есть, второй раз не добавляется
+	for (int i = 0; i < this->connects.size(); ++i) {
 		if (this->connects[i]->signal_pointer == signal_pointer &&
 			this->connects[i]->target_object_pointer == target_object_pointer &&
 			this->connects[i]->handler_pointer == handler_pointer)
@@ -367,13 +334,9 @@ void tree_base::set_connect(TYPE_SIGNAL signal_pointer,
 		}
 	}
 
-	p_value = new type_connect(); // создание объекта структуры для
-						  // хранения информации о новой связи
-	p_value->signal_pointer = signal_pointer;
-	p_value->target_object_pointer = target_object_pointer;
-	p_value->handler_pointer = handler_pointer;
+	type_connect* new_connect = new type_connect{ signal_pointer, target_object_pointer, handler_pointer };
 
-	this->connects.push_back(p_value); // добавление новой связи
+	this->connects.push_back(new_connect); // добавление новой связи
 }
 
 
@@ -383,7 +346,7 @@ void tree_base::remove_connect(TYPE_SIGNAL signal_pointer, tree_base* target_obj
 	type_connect* value = new type_connect{ signal_pointer, target_object_pointer, handler_pointer };
 	// все связи, совпадающие с value, перемещаются в конец списка.
 	// Возвращается указатель на крайний справа не совпадающий с value элемент
-	auto it_start = std::remove_if(this->connects.begin(), this->connects.end(), [value](type_connect* connect) {
+	auto it_start = remove_if(this->connects.begin(), this->connects.end(), [value](type_connect* connect) {
 		return connect->signal_pointer == value->signal_pointer &&
 			connect->handler_pointer == value->handler_pointer &&
 			connect->target_object_pointer == value->target_object_pointer;
@@ -393,7 +356,7 @@ void tree_base::remove_connect(TYPE_SIGNAL signal_pointer, tree_base* target_obj
 	// все связи, совпавшие с value, удаляются из списка
 	this->connects.erase(it_start, this->connects.end());
 
-	/*auto index = this->connects.begin();   УДАЛЯЕТ ТОЛЬКО ПЕРВОЕ ВХОЖДЕНИЕ 
+	/*auto index = this->connects.end();   // УДАЛЯЕТ ТОЛЬКО ПЕРВОЕ ВХОЖДЕНИЕ (в этой работе исключено повторное, ну и ладно)
 	for (int i = 0; i < this->connects.size(); ++i)
 	{
 		auto connect = connects[i];
@@ -401,11 +364,12 @@ void tree_base::remove_connect(TYPE_SIGNAL signal_pointer, tree_base* target_obj
 			connect->handler_pointer == handler_pointer &&
 			connect->target_object_pointer == target_object_pointer)
 		{
-			index += i;
+			index = this->connects.begin() + i;
 			break;
 		}
 	}
-	this->connects.erase(index);*/
+	if (index != this->connects.end())
+		this->connects.erase(index);*/
 }
 
 
@@ -414,26 +378,26 @@ int tree_base::get_my_readiness() const {
 }
 
 
-void tree_base::emit_signal(TYPE_SIGNAL signal_pointer, std::string& s_command)
+void tree_base::emit_signal(TYPE_SIGNAL signal_pointer, std::string& message)
 {
 	if (this->get_my_readiness() == 0) // если объект отключен
 		return;
 
 	TYPE_HANDLER handler_pointer;
-	tree_base* p_object;
+	tree_base* object_pointer;
 
-	(this->*signal_pointer)(s_command); // вызов метода сигнала
+	(this->*signal_pointer)(message); // вызов метода сигнала
 
 	// проход по всем обработчикам
-	for (unsigned int i = 0; i < this->connects.size(); ++i) 
+	for (int i = 0; i < this->connects.size(); ++i) 
 	{
 		if (this->connects[i]->signal_pointer == signal_pointer) // определение допустимого обработчика
 		{
 			handler_pointer = this->connects[i]->handler_pointer;
-			p_object = this->connects[i]->target_object_pointer;
+			object_pointer = this->connects[i]->target_object_pointer;
 
-			if (p_object->get_my_readiness() != 0) // если целевой объект готов
-				(p_object->*handler_pointer)(s_command); // вызов метода обработчика
+			if (object_pointer->get_my_readiness() != 0) // если целевой объект готов
+				(object_pointer->*handler_pointer)(message); // вызов метода обработчика
 		}
 	}
 
@@ -442,13 +406,14 @@ void tree_base::emit_signal(TYPE_SIGNAL signal_pointer, std::string& s_command)
 
 std::string tree_base::get_my_absolute_path() const
 {
-	const tree_base* p_object = this;
-	if (p_object->p_head_object == NULL) // если это корень
+	const tree_base* object_pointer = this;
+	if (object_pointer->p_head_object == NULL) // если это корень
 		return "/";
 	std::string absolute_path = "";
-	while (p_object->p_head_object != NULL) { // подъём до корня, сбор всех встречающихся объектов в absolute_path
-		absolute_path = "/" + p_object->get_my_name() + absolute_path;
-		p_object = p_object->p_head_object;
+	while (object_pointer->p_head_object != NULL)  // подъём до корня, сбор всех встречающихся объектов в absolute_path
+	{
+		absolute_path = "/" + object_pointer->s_object_name + absolute_path;
+		object_pointer = object_pointer->p_head_object;
 	}
 
 	return absolute_path;
