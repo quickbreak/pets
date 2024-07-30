@@ -32,13 +32,13 @@ void Server::slotReadyRead() {
         qDebug() << str;*/
         for (;;) {
             if (nextBlockSize == 0) {
-                qDebug() << "nextBlockSize = 0";
+                // qDebug() << "nextBlockSize = 0";
                 if (socket->bytesAvailable() < 2) {
                     qDebug() << "Data < 2, break";
                     break;
                 }
                 in >> nextBlockSize;
-                qDebug() << "nextBlockSize = " << nextBlockSize;;
+                // qDebug() << "nextBlockSize = " << nextBlockSize;;
             }
             if (socket->bytesAvailable() < nextBlockSize) {
                 qDebug() << "Data not full, break";
