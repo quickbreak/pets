@@ -1,4 +1,5 @@
-![bot](https://github.com/quickbreak/pets/blob/main/Бот/image.png)
+![image](https://github.com/user-attachments/assets/519bb02b-46cc-4ed8-8cc9-4b84075ea7e7)
+
 
 * Функционал наподобие телефонной книги (Контакты)  с помощью **СУБД SQLite**
 * **Парсинг** праздничных стихов с сайта для выбранного пользователем имени / на выбранную тему
