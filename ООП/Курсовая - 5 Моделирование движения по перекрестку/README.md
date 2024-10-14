@@ -1,1 +1,3 @@
-![crossroad](https://github.com/quickbreak/pets/blob/main/ООП/Курсовая%20-%205%20Моделирование%20движения%20по%20перекрестку/image.jpg)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c21b5c85-5fc5-4408-b362-094cf62f2e20" alt="image">
+</p>
