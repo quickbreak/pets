@@ -1,2 +1,2 @@
 ## you can`t ignore the *base* :grinning:
-![demo](https://github.com/quickbreak/pets/blob/main/Qt/hello_world/demo.png)
+![image](https://github.com/user-attachments/assets/bc67eade-c8fd-40b2-b5c0-0a8f11ac0a01)
