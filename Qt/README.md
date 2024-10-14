@@ -1,4 +1,2 @@
 # Код, демонстрационные снимки и описание проектов в Qt
-Если в проекте есть .exe файл, приложение можно запустить на вашем компьютере с Windows, скачав вместе с .exe все .dll файлы (установка дополнительных программ не потребуется)
-
-![Qt logo](https://github.com/quickbreak/pets/blob/main/Qt/QT%20logo.jpg)
+![image](https://github.com/user-attachments/assets/bced9cee-ab8e-4216-a73b-377844f57b9f)
